@@ -27,22 +27,69 @@ const choice = {
 
 function App() {
   const [userSelect, setUserSelect] = useState(null); // state에 있는 값이 변할 때 마다 UI 변하게 하기 위함.
+  const [computerSelect, setComputerSelect] = useState(null);
+  
+  const [result, setResult] = useState(""); // 결과는 비어있는 String타입 넣어놓기.
+  let [comResult, setComResult] = useState("");
 
   const play = (userChoice) => {
     // userSelect = choice[userChoice]; // state는 변수와 다르기 때문에 변수 할당처럼 이렇게 하면 안 바뀜.
     setUserSelect(choice[userChoice]);
+    let computerChoice = randomChoice();
+    setComputerSelect(computerChoice);
+
+    let userResult = judgement(choice[userChoice], computerChoice);
+    setResult(userResult); // 두 결과값 판단하는 함수.
+    // console.log(userResult, "^0^");
+
+    // comResult 판단
+    if( userResult === "tie" ){
+      comResult = "tie";
+      alert("Draw!");
+    }
+    else if( userResult === "win" ){
+      comResult = "lose";
+      alert("You Win!!!");
+    }
+    else if( userResult === "lose" ){
+      comResult = "win";
+      alert("You lose...");
+    }
+    setComResult(comResult);
+  };
+  const judgement = (user, computer) => { // 가위바위보 로직
+    // console.log("user", user, "computer", computer);
+    // user == computer -> tie
+    // 이후 총 6(2*3)개 케이스 명시하기.
+
+    if(user.name === computer.name){
+      return "tie";
+    }else if(user.name === "Rock") return computer.name === "Scissors" ? "win" : "lose";
+    else if(user.name === "Scissors") return computer.name === "Paper" ? "win" : "lose";
+    else if(user.name === "Paper") return computer.name === "Rock" ? "win" : "lose";
+  }
+
+  const randomChoice = () => {
+    // 객체의 키 값만 뽑아서 배열로 넣어주는 함수.
+    let itemArray = Object.keys(choice); // @@ 위 맨 처음 choice객체를 배열화.
+    let randomItem = Math.floor(Math.random()*itemArray.length); // 0~1사이 모든 소수
+    let final = itemArray[randomItem];
+    return choice[final]; // 위 computerChoice 안으로 랜덤 객체정보가 쏙 들어감.
   }
 
   return (
-    <div>
+    <div class="container">
       <div className="main">
-        <Box title="You" item={userSelect}/>
-        {/* <Box title="Computer"/> */}
+        <Box title="You" item={userSelect} result={result}/>
+        <Box title="Computer" item={computerSelect} result={comResult}/>
       </div>
-      <div className="main">
-        <button onClick={() => play("scissors")}>가위</button>
-        <button onClick={() => play("rock")}>바위</button>
-        <button onClick={() => play("paper")}>보</button>
+      <div>
+        <h1>Your Choice!!!</h1>
+      </div>
+      <div className="buttons">
+        <button onClick={() => play("rock")}><img src="image/rock.png" class="imgs" alt=""/></button>
+        <button onClick={() => play("scissors")}><img src="image/scissors.png" class="imgs" alt=""/></button>
+        <button onClick={() => play("paper")}><img src="image/paper.png" class="imgs" alt=""/></button>
       </div>
     </div>
   );
